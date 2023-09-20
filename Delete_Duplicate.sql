@@ -1,32 +1,41 @@
---Delete Duplicate Rowss in SQL
+--SQL Query to delete duplicates from a table
 
-Create table Employees
+CREATE TABLE dbo.Employee
 (
- ID int,
- FirstName nvarchar(50),
- LastName nvarchar(50),
- Gender nvarchar(50),
- Salary int
-)
-GO
+ EmployeeID INT , 
+ FirstName  varchar(50) ,
+ LastName varchar(50) ,
+ Phone varchar(20) ,
+ Email varchar(50)
+);
 
-Insert into Employees values (1, 'Mark', 'Hastings', 'Male', 60000)
-Insert into Employees values (1, 'Mark', 'Hastings', 'Male', 60000)
-Insert into Employees values (1, 'Mark', 'Hastings', 'Male', 60000)
-Insert into Employees values (2, 'Mary', 'Lambeth', 'Female', 30000)
-Insert into Employees values (2, 'Mary', 'Lambeth', 'Female', 30000)
-Insert into Employees values (3, 'Ben', 'Hoskins', 'Male', 70000)
-Insert into Employees values (3, 'Ben', 'Hoskins', 'Male', 70000)
-Insert into Employees values (3, 'Ben', 'Hoskins', 'Male', 70000)
+INSERT INTO dbo.Employee VALUES 
+(1, 'Adam', 'Owens', '444345999' , 'adam@demo.com'),
+(2, 'Mark', 'Wilis', '245666921' , 'mark@demo.com'),
+(3, 'Natasha', 'Lee', '321888909' , 'natasha@demo.com'),
+(4, 'Adam', 'Owens', '444345999' , 'adam@demo.com'),
+(5, 'Riley', 'Jones', '123345959' , 'riley@demo.com'),
+(6, 'Natasha', 'Lee', '321888909' , 'natasha@demo.com');
 
-select * from Employees
+select * from dbo.Employee
+
+--Using a Sub-Query
+
+Delete from dbo.Employee
+where EmployeeID NOT IN
+(Select Max(EmployeeID) from dbo.Employee
+GROUP BY FirstName, LastName);
+
+--Using CTE
+
+With Employee_CTE as 
+(Select *, 
+RANK() OVER (Partition by FirstName, LastName ORDER BY EmployeeID desc) as RANK
+From dbo.Employee)
+
+Delete from Employee_CTE
+where Rank>1
 
 
-With EmployeeCTE AS
-(
-	Select *, ROW_NUMBER() Over(Partition BY ID order by ID) as RowNumber
-	From Employees
-)
-Delete from EmployeeCTE where RowNumber > 1
 
-select * from Employees
+
