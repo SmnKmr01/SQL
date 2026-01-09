@@ -1,0 +1,45 @@
+--- Q5 : Ungroup the given input data --- 
+
+drop table travel_items;
+create table travel_items
+(
+	id              int,
+	item_name       varchar(50),
+	total_count     int
+);
+insert into travel_items values (1, 'Water Bottle', 2);
+insert into travel_items values (2, 'Tent', 1);
+insert into travel_items values (3, 'Apple', 4);
+
+select * from travel_items
+
+
+
+with  cte as(
+select id, item_name, total_count, 1 as level 
+from travel_items
+union all 
+select cte.id, cte.item_name, cte.total_count - 1, level+1 as level 
+from cte
+join travel_items t 
+on t.Item_name = cte.Item_name 
+and t.id = cte.id
+where cte.total_count > 1
+)
+select id, item_name
+from cte
+order by 1
+
+WITH cte AS (
+    SELECT id, item_name, total_count, 1 AS level
+    FROM travel_items
+
+    UNION ALL
+
+    SELECT id, item_name, total_count, level + 1
+    FROM cte
+    WHERE level < total_count
+)
+SELECT id, item_name
+FROM cte
+ORDER BY id;
